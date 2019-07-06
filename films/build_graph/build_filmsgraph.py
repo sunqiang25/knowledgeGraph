@@ -1,7 +1,7 @@
 # coding: utf-8
 
 import os,csv,codecs
-import json
+import json,time
 from py2neo import Graph,Node
 
 class FilmGraph:
@@ -10,7 +10,7 @@ class FilmGraph:
         self.cur_dir = cur_dir
         self.data_path = os.path.join(self.cur_dir, 'film_info.json')
         self.g = Graph(
-            host="10.37.2.248", 
+            host="localhost", 
             http_port=7474, 
             user="neo4j",  
             password="1qaz@WSX")
@@ -194,7 +194,7 @@ class FilmGraph:
         films,directors,stars,types,company,areas,languages,film_infos,rels_director,rels_star,rels_type,\
             rels_faxing_company,rels_area,rels_language,rels_scriptwriter = handler.get_nodes()        
         #self.create_relationship('Film', 'Film_Director', rels_director, 'director', '导演')
-        self.create_relationship('Film', 'Film_Actor', rels_star, 'actor', '主演')
+        self.create_relationship('Film', 'Film_Star', rels_star, 'actor', '主演')
         self.create_relationship('Film', 'Film_Type', rels_type, 'type', '类型')
         self.create_relationship('Film', 'Film_Company', rels_faxing_company, 'faxing_company', '发行公司')
         self.create_relationship('Film', 'Film_Area', rels_area, 'area', '地区')
@@ -219,6 +219,7 @@ class FilmGraph:
                 print(rel_type, count, all)
             except Exception as e:
                 print(e)
+                continue
         return
 
 if __name__ == '__main__':
@@ -232,7 +233,8 @@ if __name__ == '__main__':
     #csv_name = ["films","directors","stars","types","company","areas","languages"]
     #if not os.path.exists(handler.cur_dir+"/films_data"):
         #os.mkdir(handler.cur_dir+"/films_data")
-    #for i,d in enumerate(write2csv):
+    #for i,d in enumerate(csv_name):
+        #handler.create_node(csv_name[i]+".csv")
         #handler.write_list2csv(d,"films_data/%s.csv"%(csv_name[i]))
     info = {"rels_director":{"data":rels_director,"csv_name":"rels_director.csv","start_node":"Film","end_node":"Film_Director","rel_type":"director","rel_name":"导演"},\
             "rels_star":{"data":rels_star,"csv_name":"rels_star.csv","start_node":"Film","end_node":"Film_Star","rel_type":"actor","rel_name":"主演"},
@@ -242,16 +244,17 @@ if __name__ == '__main__':
             "rels_language":{"data":rels_language,"csv_name":"rels_language.csv","start_node":"Film","end_node":"Film_Language","rel_type":"language","rel_name":"语言"}}
     for k,v in info.items():
         data,csv_name,start_node,end_node,rel_type,rel_name = v["data"],v["csv_name"],v["start_node"],v["end_node"],v["rel_type"],v["rel_name"]
-        handler.write_rels_list2csv(data,csv_name)
-        #cmd="docker cp %s 482c7a40e2dc:/var/lib/neo4j/import"%(os.path.join(handler.cur_dir,csv_name))
-        #try:
-            #subprocess.call(cmd, shell=True)
-        #except Exception as error:
-            #print(error)    
-        #handler.create_rels_from_csv(csv_file_name=csv_name, start_node=start_node, end_node=end_node, 
-                                    #rel_type=rel_type, 
-                                    #rel_name=rel_name)
-        #print("Done of {}".format(k))
+        #handler.write_rels_list2csv(data,csv_name)
+        path = "/opt/knowledgeGraph/films/rels_film"
+        cmd="docker cp %s 85b5d7fc2f1c:/var/lib/neo4j/import"%(os.path.join(path,csv_name))
+        try:
+            subprocess.call(cmd, shell=True)
+        except Exception as error:
+            print(error)    
+        handler.create_rels_from_csv(csv_file_name=csv_name, start_node=start_node, end_node=end_node, 
+                                    rel_type=rel_type, 
+                                    rel_name=rel_name)
+        print("Done of {}".format(k))
 
 
 
