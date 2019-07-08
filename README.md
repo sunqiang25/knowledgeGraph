@@ -1,3 +1,3 @@
 # knowledgeGraph  
-![](https://files-cdn.cnblogs.com/files/jiangqiuju/neo4j_2.gif)  
-![](https://files-cdn.cnblogs.com/files/jiangqiuju/neo4j.gif)
+![](https://github.com/sunqiang25/knowledgeGraph/blob/master/neo4j_1.gif)  
+![](https://github.com/sunqiang25/knowledgeGraph/blob/master/neo4j.gif)
